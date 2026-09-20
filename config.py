@@ -1,27 +1,27 @@
 # ====================== CONFIG ======================
 
 # Режим работы
-PAPER_TRADING = True          # True = симуляция | False = реальные деньги (ОПАСНО!)
+PAPER_TRADING = True          # True = симуляция | False = реальные деньги (ОЧЕНЬ ОПАСНО!)
 
 # Капитал
 STARTING_BALANCE = 50.0       # стартовый капитал в USDT
 
-# Биржа и пара
+# Биржа и пара (мем-коины)
 EXCHANGE_ID = "binance"
-SYMBOL = "BTC/USDT"
-TIMEFRAME = "15m"
+SYMBOL = "DOGE/USDT"          # Можно менять: DOGE/USDT, SHIB/USDT, PEPE/USDT, WIF/USDT, BONK/USDT
+TIMEFRAME = "5m"              # Для мемов лучше короткий таймфрейм
 
 # Стратегия
-FAST_SMA = 10
-SLOW_SMA = 30
+FAST_SMA = 8
+SLOW_SMA = 21
 
-# ===== РИСК-МЕНЕДЖМЕНТ (под $50) =====
-RISK_PER_TRADE = 0.02         # 2% риска на сделку
-STOP_LOSS_PCT = 0.025         # 2.5% стоп-лосс
-TAKE_PROFIT_PCT = 0.05        # 5% тейк-профит (1:2)
-MAX_DAILY_LOSS_PCT = 0.06     # 6% дневной лимит
-MAX_DRAWDOWN_PCT = 0.20       # 20% максимальная просадка → бот стоп
-MAX_POSITIONS = 1             # только 1 позиция
+# ===== РИСК-МЕНЕДЖМЕНТ для МЕМ-КОИНОВ =====
+RISK_PER_TRADE = 0.015        # 1.5% риска (ещё строже из-за волатильности)
+STOP_LOSS_PCT = 0.04          # 4% стоп-лосс (мемы сильно шумят)
+TAKE_PROFIT_PCT = 0.08        # 8% тейк-профит (1:2)
+MAX_DAILY_LOSS_PCT = 0.05     # 5% дневной лимит
+MAX_DRAWDOWN_PCT = 0.15       # 15% максимальная просадка → бот стоп
+MAX_POSITIONS = 1
 
 # API ключи (только для реальной торговли)
 API_KEY = ""
