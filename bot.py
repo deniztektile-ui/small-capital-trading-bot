@@ -10,6 +10,8 @@ import pandas as pd
 from datetime import datetime, date
 from config import *
 
+POLL = int(globals().get("POLL_SECONDS", 8))
+
 class SmallCapitalBot:
     def __init__(self):
         self.balance = STARTING_BALANCE
@@ -18,6 +20,7 @@ class SmallCapitalBot:
         self.daily_pnl = 0.0
         self.today = date.today()
         self.trades_today = 0
+        self.last_bar = None
 
         print("=" * 60)
         print("  Small Capital Meme Coin Bot")
@@ -83,10 +86,15 @@ class SmallCapitalBot:
         prev_slow = df["sma_slow"].iloc[-2]
         curr_fast = df["sma_fast"].iloc[-1]
         curr_slow = df["sma_slow"].iloc[-1]
+        close = df["close"].iloc[-1]
 
         if prev_fast <= prev_slow and curr_fast > curr_slow:
             return "BUY"
+        if curr_fast > curr_slow and close > curr_slow:
+            return "BUY"
         if prev_fast >= prev_slow and curr_fast < curr_slow:
+            return "SELL"
+        if curr_fast < curr_slow and close < curr_slow:
             return "SELL"
         return None
 
@@ -154,18 +162,22 @@ class SmallCapitalBot:
                 df = self.fetch_data()
                 price = float(df["close"].iloc[-1])
                 signal = self.get_signal(df)
+                bar_ts = int(df["ts"].iloc[-2]) if len(df) >= 2 else None
 
                 self.manage_position(price)
 
-                if signal == "BUY" and self.position is None:
+                same_bar = bar_ts is not None and self.last_bar == bar_ts
+                if signal == "BUY" and self.position is None and not same_bar:
                     self.open_long(price)
-                elif signal == "SELL" and self.position is not None:
+                    self.last_bar = bar_ts
+                elif signal == "SELL" and self.position is not None and not same_bar:
                     self.close_position(price, "SIGNAL")
+                    self.last_bar = bar_ts
 
                 pos = "LONG" if self.position else "FLAT"
-                print(f"[{self.now()}] {SYMBOL} {price:.6f} | {pos} | Balance: {self.balance:.2f} | Daily: {self.daily_pnl:+.2f}")
+                print(f"[{self.now()}] {SYMBOL} {price:.6f} | {pos} | sig={signal or '-'} | Balance: {self.balance:.2f} | Daily: {self.daily_pnl:+.2f}")
 
-                time.sleep(20)
+                time.sleep(POLL)
 
             except KeyboardInterrupt:
                 print("\nBot stopped by user.")
